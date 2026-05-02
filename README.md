@@ -29,7 +29,7 @@ It currently provides the following features:
 - Class motions
 - Smart increment (increment/decrement tailwindcss units using `<C-a>` and `<C-x>`)
 - Class sorting (without [prettier-plugin](https://github.com/tailwindlabs/prettier-plugin-tailwindcss))
-- Completion utilities (using [nvim-cmp](https://github.com/hrsh7th/nvim-cmp))
+- Completion utilities (using [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) or [blink.cmp](https://github.com/Saghen/blink.cmp))
 - Class previewer (using [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim))
 
 > [!NOTE]
@@ -188,6 +188,42 @@ return {
 
 > [!TIP]
 > You can extend it by calling the function and get the returned `vim_item`, see the nvim-cmp [wiki](https://github.com/hrsh7th/nvim-cmp/wiki/Menu-Appearance) to learn more.
+
+### blink.cmp
+
+Tailwind color highlighting for [blink.cmp](https://github.com/Saghen/blink.cmp). Drop-in `kind_icon` component that paints the kind icon in the matched Tailwind color when the LSP completion is a color, and falls back to the default `BlinkCmpKind*` highlight otherwise:
+
+```lua
+-- blink.lua
+return {
+  "saghen/blink.cmp",
+  dependencies = { "tailwind-tools" },
+  opts = {
+    completion = {
+      menu = {
+        draw = {
+          components = {
+            kind_icon = require("tailwind-tools.blink").kind_icon,
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+If you maintain your own `kind_icon` component, compose with the lower-level `highlight` function instead:
+
+```lua
+kind_icon = {
+  text = function(ctx) return ctx.kind_icon .. ctx.icon_gap end,
+  highlight = function(ctx)
+    return require("tailwind-tools.blink").highlight(ctx) or ctx.kind_hl
+  end,
+}
+```
+
+The `cmp.highlight` option (`"foreground"` or `"background"`) controls the styling for both nvim-cmp and blink.cmp.
 
 ### telescope.nvim
 
